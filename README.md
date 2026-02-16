@@ -189,9 +189,8 @@ Auto → Logger → Raspberry Pi (Edge DB) → Sync → HQ NAS (Master DB)
 
 | Datentyp | Volumen |
 |---|---|
-| Reifendaten | < 100 MB / Jahr |
-| Setup‑Sheets | < 50 MB / Jahr |
-| Telemetrie | 1–10 GB pro Wochenende |
+| Reifendaten | ~ 100 MB|
+| Telemetrie | 20 GB pro Wochenende / Auto|
 
 **Empfehlung:** 256–512 GB SSD für den Pi
 

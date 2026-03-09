@@ -1,0 +1,128 @@
+<% var pageTitle = 'Alle Einträge'; %>
+<%- include('../partials/header') %>
+
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-6 fw-bold">
+            <i class="bi bi-clipboard-data me-2 text-primary"></i>Reifendruck-Einträge
+        </h1>
+        <p class="text-muted mb-0">Alle erfassten Druck- und Temperaturdaten</p>
+    </div>
+    <div class="col-auto d-flex align-items-center gap-2">
+        <a href="/export/csv" class="btn btn-outline-success">
+            <i class="bi bi-download me-1"></i>CSV Export
+        </a>
+        <a href="/reifendruck/neu" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle me-2"></i>Neuer Eintrag
+        </a>
+    </div>
+</div>
+
+<!-- Suchfilter -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <div class="row g-2 align-items-center">
+            <div class="col-auto"><i class="bi bi-search text-muted"></i></div>
+            <div class="col">
+                <input type="text" id="searchInput" class="form-control form-control-sm border-0"
+                       placeholder="Suchen nach Datum, Strecke, Fahrer, Set-Nr ...">
+            </div>
+            <div class="col-auto">
+                <span id="resultCount" class="badge bg-secondary"><%= entries.length %> Einträge</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% if (entries.length > 0) { %>
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0" id="entryTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Datum</th>
+                    <th>Event</th>
+                    <th>Session</th>
+                    <th>Strecke</th>
+                    <th>Set Nr.</th>
+                    <th>Typ</th>
+                    <th>Fahrer</th>
+                    <th>Runden</th>
+                    <th>km</th>
+                    <th class="text-end">Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (const e of entries) { %>
+                <tr class="entry-row">
+                    <td><span class="badge bg-secondary"><%= e.id %></span></td>
+                    <td class="fw-semibold"><%= e.datum || '–' %></td>
+                    <td><span class="badge bg-info"><%= e.veranstaltung || '–' %></span></td>
+                    <td>
+                        <%= e.session_typ || '–' %>
+                        <% if (e.stint_nr) { %><small class="text-muted">(Stint <%= e.stint_nr %>)</small><% } %>
+                    </td>
+                    <td>
+                        <% if (e.strecken_variante) { %>
+                        <i class="bi bi-geo-alt me-1 text-danger"></i><%= e.strecken_variante %>
+                        <% } else { %>–<% } %>
+                    </td>
+                    <td><span class="badge bg-primary"><%= e.set_nr || '–' %></span></td>
+                    <td>
+                        <% if (e.reifen_typ === 'Slicks') { %>
+                        <span class="badge bg-dark"><i class="bi bi-sun"></i></span>
+                        <% } else if (e.reifen_typ === 'Nass') { %>
+                        <span class="badge bg-primary"><i class="bi bi-cloud-rain"></i></span>
+                        <% } else { %>–<% } %>
+                    </td>
+                    <td><%= e.fahrer || '–' %></td>
+                    <td><%= e.rundenanzahl || '–' %></td>
+                    <td><%= e.laufzeit_km || '–' %></td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="/reifendruck/<%= e.id %>" class="btn btn-outline-primary" title="Anzeigen">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/reifendruck/<%= e.id %>/bearbeiten" class="btn btn-outline-warning" title="Bearbeiten">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="/reifendruck/<%= e.id %>/duplizieren" class="btn btn-outline-info" title="Duplizieren">
+                                <i class="bi bi-copy"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<% } else { %>
+<div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h3 class="mt-3 text-muted">Noch keine Einträge</h3>
+        <p class="text-muted">Lege deinen ersten Reifendruck-Eintrag an, um loszulegen.</p>
+        <a href="/reifendruck/neu" class="btn btn-primary btn-lg mt-2">
+            <i class="bi bi-plus-circle me-2"></i>Ersten Eintrag anlegen
+        </a>
+    </div>
+</div>
+<% } %>
+
+<script>
+document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.entry-row');
+    let count = 0;
+    rows.forEach(row => {
+        const show = row.textContent.toLowerCase().includes(q);
+        row.style.display = show ? '' : 'none';
+        if (show) count++;
+    });
+    document.getElementById('resultCount').textContent = count + ' Einträge';
+});
+</script>
+
+<%- include('../partials/footer') %>

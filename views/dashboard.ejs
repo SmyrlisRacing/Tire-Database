@@ -1,0 +1,174 @@
+<% var pageTitle = 'Dashboard'; %>
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-6 fw-bold">
+            <i class="bi bi-speedometer2 me-2 text-primary"></i>Dashboard
+        </h1>
+        <p class="text-muted mb-0">Übersicht über alle erfassten Reifendaten</p>
+    </div>
+    <div class="col-auto d-flex align-items-center">
+        <a href="/reifendruck/neu" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle me-2"></i>Neuen Eintrag anlegen
+        </a>
+    </div>
+</div>
+
+<!-- Statistik-Karten -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-primary mb-2"><i class="bi bi-clipboard-data fs-1"></i></div>
+                <h2 class="fw-bold mb-0"><%= stats.anzahl_eintraege %></h2>
+                <small class="text-muted">Einträge</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-success mb-2"><i class="bi bi-collection fs-1"></i></div>
+                <h2 class="fw-bold mb-0"><%= stats.anzahl_sets %></h2>
+                <small class="text-muted">Reifensätze</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-xl">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-warning mb-2"><i class="bi bi-gear fs-1"></i></div>
+                <h2 class="fw-bold mb-0"><%= stats.anzahl_felgen %></h2>
+                <small class="text-muted">Felgen erfasst</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-danger mb-2"><i class="bi bi-speedometer fs-1"></i></div>
+                <h2 class="fw-bold mb-0"><%= stats.gesamt_km %></h2>
+                <small class="text-muted">Gesamt km</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl">
+        <div class="card stat-card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-secondary mb-2"><i class="bi bi-arrow-repeat fs-1"></i></div>
+                <h2 class="fw-bold mb-0"><%= stats.gesamt_runden %></h2>
+                <small class="text-muted">Runden gesamt</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Letzte Einträge -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Letzte Einträge</h5>
+                <a href="/reifendruck" class="btn btn-sm btn-outline-primary">
+                    Alle anzeigen <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <% if (stats.letzte_eintraege && stats.letzte_eintraege.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Datum</th>
+                                <th>Event</th>
+                                <th>Session</th>
+                                <th>Strecke</th>
+                                <th>Set</th>
+                                <th>Fahrer</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (const e of stats.letzte_eintraege) { %>
+                            <tr>
+                                <td><span class="badge bg-secondary"><%= e.id %></span></td>
+                                <td><%= e.datum || '–' %></td>
+                                <td><span class="badge bg-info"><%= e.veranstaltung || '–' %></span></td>
+                                <td><%= e.session_typ || '–' %><% if (e.stint_nr) { %> <small>(S<%= e.stint_nr %>)</small><% } %></td>
+                                <td><%= e.strecken_variante || '–' %></td>
+                                <td><span class="badge bg-primary"><%= e.set_nr || '–' %></span></td>
+                                <td><%= e.fahrer || '–' %></td>
+                                <td>
+                                    <a href="/reifendruck/<%= e.id %>" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <% } else { %>
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="text-muted mt-2">Noch keine Einträge vorhanden</p>
+                    <a href="/reifendruck/neu" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Ersten Eintrag anlegen
+                    </a>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schnellzugriff & System -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Schnellzugriff</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/reifendruck/neu" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Neuer Reifendruck-Eintrag
+                    </a>
+                    <a href="/laufzeiten/reifen" class="btn btn-outline-info">
+                        <i class="bi bi-circle me-2"></i>Reifen-Laufzeiten
+                    </a>
+                    <a href="/laufzeiten/felgen" class="btn btn-outline-warning">
+                        <i class="bi bi-gear me-2"></i>Felgen-Laufzeiten
+                    </a>
+                    <a href="/export/csv" class="btn btn-outline-success">
+                        <i class="bi bi-download me-2"></i>Daten als CSV exportieren
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-hdd me-2"></i>System</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Datenbankgröße</span>
+                        <strong><%= stats.db_groesse %></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Sessions</span>
+                        <strong><%= stats.anzahl_sessions %></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Status</span>
+                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Online</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

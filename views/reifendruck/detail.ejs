@@ -1,0 +1,323 @@
+<%
+var pageTitle = 'Eintrag #' + entry.id;
+function v(field) { return entry[field] != null ? entry[field] : '–'; }
+function vn(field) { return entry[field] != null ? entry[field] : null; }
+
+const streckenName = {
+    'NLS': 'Nürburgring Nordschleife – NLS',
+    '24h': 'Nürburgring Nordschleife – 24h'
+};
+%>
+<%- include('../partials/header') %>
+
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-6 fw-bold">
+            <i class="bi bi-clipboard-check me-2 text-primary"></i>
+            Eintrag #<%= entry.id %>
+            <% if (entry.session_typ) { %>
+            <small class="text-muted">– <%= entry.session_typ %></small>
+            <% } %>
+        </h1>
+    </div>
+    <div class="col-auto d-flex align-items-center gap-2">
+        <a href="/reifendruck/<%= entry.id %>/duplizieren" class="btn btn-outline-info">
+            <i class="bi bi-copy me-1"></i>Duplizieren
+        </a>
+        <a href="/reifendruck/<%= entry.id %>/bearbeiten" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i>Bearbeiten
+        </a>
+        <form method="POST" action="/reifendruck/<%= entry.id %>/loeschen"
+              onsubmit="return confirm('Eintrag #<%= entry.id %> wirklich löschen?');" style="display:inline">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="bi bi-trash me-1"></i>Löschen
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Session Info -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Session-Informationen</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="detail-field">
+                    <span class="detail-label"><i class="bi bi-calendar3 me-1"></i>Datum</span>
+                    <span class="detail-value"><%= v('datum') %></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="detail-field">
+                    <span class="detail-label"><i class="bi bi-geo-alt me-1"></i>Strecke</span>
+                    <span class="detail-value">
+                        <%= streckenName[entry.strecken_variante] || v('strecken_variante') %>
+                        <% if (vn('strecken_laenge')) { %> (<%= entry.strecken_laenge %> km)<% } %>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="detail-field">
+                    <span class="detail-label"><i class="bi bi-trophy me-1"></i>Event</span>
+                    <span class="detail-value fs-5 fw-bold text-info"><%= v('veranstaltung') %></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="detail-field">
+                    <span class="detail-label"><i class="bi bi-flag me-1"></i>Session</span>
+                    <span class="detail-value fs-5 fw-bold"><%= v('session_typ') %></span>
+                </div>
+            </div>
+            <% if (vn('stint_nr')) { %>
+            <div class="col-md-2">
+                <div class="detail-field">
+                    <span class="detail-label"><i class="bi bi-hash me-1"></i>Stint Nr.</span>
+                    <span class="detail-value fs-4 fw-bold text-primary"><%= entry.stint_nr %></span>
+                </div>
+            </div>
+            <% } %>
+            <div class="col-md-3">
+                <div class="detail-field">
+                    <span class="detail-label"><i class="bi bi-person me-1"></i>Fahrer</span>
+                    <span class="detail-value"><%= v('fahrer') %></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="detail-field">
+                    <span class="detail-label">Fahrzeug</span>
+                    <span class="detail-value"><%= v('fahrzeug') %></span>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="detail-field">
+                    <span class="detail-label">Start-Nr.</span>
+                    <span class="detail-value"><%= v('startnummer') %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reifen Info -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-circle me-2"></i>Reifen-Informationen</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <div class="detail-field">
+                    <span class="detail-label">Set Nr.</span>
+                    <span class="detail-value fs-4 fw-bold text-primary"><%= v('set_nr') %></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="detail-field">
+                    <span class="detail-label">Felgen Nr.</span>
+                    <span class="detail-value"><%= v('felgen_nr') %></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="detail-field">
+                    <span class="detail-label">Marke</span>
+                    <span class="detail-value"><%= v('marke') %></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="detail-field">
+                    <span class="detail-label">Reifentyp</span>
+                    <span class="detail-value">
+                        <% if (entry.reifen_typ === 'Slicks') { %>
+                        <span class="badge bg-dark fs-6"><i class="bi bi-sun me-1"></i>Slicks</span>
+                        <% } else if (entry.reifen_typ === 'Nass') { %>
+                        <span class="badge bg-primary fs-6"><i class="bi bi-cloud-rain me-1"></i>Nass</span>
+                        <% } else { %>–<% } %>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ Kalt / Warm Nebeneinander ═══ -->
+<div class="row g-4 mb-4">
+    <%
+    const positions = [
+        {k:'vl', l:'VL', s:'Vorne Links'},
+        {k:'vr', l:'VR', s:'Vorne Rechts'},
+        {k:'hl', l:'HL', s:'Hinten Links'},
+        {k:'hr', l:'HR', s:'Hinten Rechts'}
+    ];
+    %>
+
+    <!-- KALT -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header section-cold">
+                <h5 class="mb-0"><i class="bi bi-thermometer-low me-2"></i>KALT</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-4">
+                        <div class="detail-field"><span class="detail-label">Uhrzeit</span><span class="detail-value"><%= v('zeit_kaltdruck') %></span></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="detail-field"><span class="detail-label">Luft °C</span><span class="detail-value"><%= v('luft_temp_kalt') %></span></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="detail-field"><span class="detail-label">Track °C</span><span class="detail-value"><%= v('track_temp_kalt') %></span></div>
+                    </div>
+                </div>
+                <div class="tire-detail-grid">
+                    <% for (const pos of positions) { %>
+                    <div class="tire-detail-box cold">
+                        <div class="fw-bold mb-1"><%= pos.l %> <small class="text-muted">(<%= pos.s %>)</small></div>
+                        <div class="fs-4 fw-bold text-primary mb-1"><%= v('kaltdruck_' + pos.k) %> <small class="fs-6">bar</small></div>
+                        <div class="row g-1 text-center">
+                            <div class="col-4"><small class="text-muted d-block">Außen</small><span class="fw-semibold"><%= v('lft_kalt_' + pos.k + '_aussen') %></span></div>
+                            <div class="col-4"><small class="text-muted d-block">Mitte</small><span class="fw-semibold"><%= v('lft_kalt_' + pos.k + '_mitte') %></span></div>
+                            <div class="col-4"><small class="text-muted d-block">Innen</small><span class="fw-semibold"><%= v('lft_kalt_' + pos.k + '_innen') %></span></div>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WARM -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header section-hot">
+                <h5 class="mb-0"><i class="bi bi-thermometer-high me-2"></i>WARM</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-4">
+                        <div class="detail-field"><span class="detail-label">Uhrzeit</span><span class="detail-value"><%= v('zeit_warmdruck') %></span></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="detail-field"><span class="detail-label">Luft °C</span><span class="detail-value"><%= v('luft_temp_warm') %></span></div>
+                    </div>
+                    <div class="col-4">
+                        <div class="detail-field"><span class="detail-label">Track °C</span><span class="detail-value"><%= v('track_temp_warm') %></span></div>
+                    </div>
+                </div>
+                <div class="tire-detail-grid">
+                    <% for (const pos of positions) { %>
+                    <div class="tire-detail-box hot">
+                        <div class="fw-bold mb-1"><%= pos.l %> <small class="text-muted">(<%= pos.s %>)</small></div>
+                        <div class="fs-4 fw-bold text-danger mb-1"><%= v('warmdruck_' + pos.k) %> <small class="fs-6">bar</small></div>
+                        <div class="row g-1 text-center">
+                            <div class="col-4"><small class="text-muted d-block">Außen</small><span class="fw-semibold"><%= v('lft_warm_' + pos.k + '_aussen') %></span></div>
+                            <div class="col-4"><small class="text-muted d-block">Mitte</small><span class="fw-semibold"><%= v('lft_warm_' + pos.k + '_mitte') %></span></div>
+                            <div class="col-4"><small class="text-muted d-block">Innen</small><span class="fw-semibold"><%= v('lft_warm_' + pos.k + '_innen') %></span></div>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Druckvergleich Tabelle -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Druckvergleich (bar)</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0 text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Position</th>
+                        <th class="table-info">Kaltdruck</th>
+                        <th class="table-danger">Warmdruck</th>
+                        <th>RDK-Druck</th>
+                        <th>Diff (W-K)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for (const pos of positions) { %>
+                    <tr>
+                        <td class="fw-bold"><%= pos.s %></td>
+                        <td class="table-info"><%= v('kaltdruck_' + pos.k) %></td>
+                        <td class="table-danger"><%= v('warmdruck_' + pos.k) %></td>
+                        <td><%= v('rdk_druck_' + pos.k) %></td>
+                        <td>
+                            <% if (vn('warmdruck_' + pos.k) && vn('kaltdruck_' + pos.k)) {
+                                const diff = entry['warmdruck_' + pos.k] - entry['kaltdruck_' + pos.k]; %>
+                                <span class="<%= diff > 0 ? 'text-danger' : diff < 0 ? 'text-primary' : '' %> fw-bold">
+                                    <%= diff > 0 ? '+' : '' %><%= diff.toFixed(2) %>
+                                </span>
+                            <% } else { %>–<% } %>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- RDK-Temp & Laufleistung -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><i class="bi bi-broadcast me-2"></i>RDK-Temperaturen (°C)</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 text-center">
+                    <% for (const pos of positions) { %>
+                    <div class="col-3">
+                        <div class="detail-field">
+                            <span class="detail-label"><%= pos.l %></span>
+                            <span class="detail-value"><%= v('rdk_temp_' + pos.k) %></span>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-dark text-white">
+                <h6 class="mb-0"><i class="bi bi-speedometer me-2"></i>Laufleistung</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 text-center">
+                    <div class="col-6">
+                        <div class="detail-field">
+                            <span class="detail-label">Runden</span>
+                            <span class="detail-value fs-3 fw-bold"><%= v('rundenanzahl') %></span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="detail-field">
+                            <span class="detail-label">Distanz</span>
+                            <span class="detail-value fs-3 fw-bold">
+                                <% if (vn('laufzeit_km')) { %><%= entry.laufzeit_km %> km<% } else { %>–<% } %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mb-4">
+    <a href="/reifendruck" class="btn btn-outline-secondary btn-lg">
+        <i class="bi bi-arrow-left me-2"></i>Zurück zur Liste
+    </a>
+    <a href="/reifendruck/<%= entry.id %>/bearbeiten" class="btn btn-warning btn-lg">
+        <i class="bi bi-pencil me-2"></i>Bearbeiten
+    </a>
+</div>
+
+<%- include('../partials/footer') %>

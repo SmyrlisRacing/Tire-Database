@@ -1,0 +1,248 @@
+/* ══════════════════════════════════════════════════════════════
+   Track-Datenserver – Reifendatenbank
+   Custom Styles
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Allgemein ── */
+body {
+    background-color: #f5f6fa;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── Stat-Cards auf Dashboard ── */
+.stat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+/* ── Section-Cards im Formular ── */
+.section-card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+.section-card .card-header {
+    font-size: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+/* Kaltdruck Header */
+.section-cold {
+    background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+    color: white;
+}
+
+/* Warmdruck Header */
+.section-hot {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+    color: white;
+}
+
+/* Temperatur Header */
+.section-temp {
+    background: linear-gradient(135deg, #fd7e14, #ffc107);
+    color: white;
+}
+
+/* ── Druck-Grid (4er-Layout für VL/VR/HL/HR) ── */
+.pressure-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+@media (max-width: 768px) {
+    .pressure-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.pressure-card {
+    background: #f0f7ff;
+    border: 2px solid #d0e3ff;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: border-color 0.2s;
+}
+.pressure-card:hover {
+    border-color: #0d6efd;
+}
+.pressure-card.hot {
+    background: #fff5f5;
+    border-color: #ffd0d0;
+}
+.pressure-card.hot:hover {
+    border-color: #dc3545;
+}
+
+.pressure-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0d6efd;
+    margin-bottom: 0.1rem;
+}
+.pressure-card.hot .pressure-label {
+    color: #dc3545;
+}
+.pressure-sublabel {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+/* ── Reifen-Layout (visuelles Auto) ── */
+.tire-layout {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+}
+.tire-car-container {
+    max-width: 500px;
+    width: 100%;
+}
+.tire-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 0.5rem 3rem;
+    position: relative;
+}
+.tire-pos {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+}
+.tire-center {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* ── Neue Reifen-Druck-Grid (2x2 für Kalt/Warm) ── */
+.tire-pressure-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+@media (max-width: 576px) {
+    .tire-pressure-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tire-box {
+    border-radius: 12px;
+    padding: 0.75rem;
+    text-align: center;
+}
+.tire-box.cold {
+    background: #f0f7ff;
+    border: 2px solid #d0e3ff;
+}
+.tire-box.cold:hover {
+    border-color: #0d6efd;
+}
+.tire-box.hot {
+    background: #fff5f5;
+    border: 2px solid #ffd0d0;
+}
+.tire-box.hot:hover {
+    border-color: #dc3545;
+}
+.tire-box-header {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.tire-box.cold .tire-box-header {
+    color: #0d6efd;
+}
+.tire-box.hot .tire-box-header {
+    color: #dc3545;
+}
+
+/* ── Detail-Ansicht Tire Grid ── */
+.tire-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+.tire-detail-box {
+    border-radius: 12px;
+    padding: 0.75rem;
+}
+.tire-detail-box.cold {
+    background: #f0f7ff;
+    border: 2px solid #d0e3ff;
+}
+.tire-detail-box.hot {
+    background: #fff5f5;
+    border: 2px solid #ffd0d0;
+}
+
+.form-label.x-small {
+    font-size: 0.7rem;
+}
+
+/* ── Temperatur-Reifen-Cards ── */
+.temp-tire-card {
+    background: #fffbf0;
+    border: 2px solid #ffe0a0;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+/* ── Detail-Ansicht ── */
+.detail-field {
+    margin-bottom: 0.5rem;
+}
+.detail-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.15rem;
+}
+.detail-value {
+    display: block;
+    font-size: 1rem;
+    color: #212529;
+}
+
+/* ── Tabellen ── */
+.table th {
+    white-space: nowrap;
+}
+
+/* ── Navbar ── */
+.navbar-brand {
+    font-size: 1.15rem;
+}
+
+/* ── Bemerkung-Form in Felgen-Tabelle ── */
+.bemerkung-form {
+    min-width: 250px;
+}
+
+/* ── Cards generell ── */
+.card {
+    border-radius: 12px;
+}
+
+/* ── Große Touch-freundliche Inputs ── */
+.form-control-lg {
+    font-size: 1.15rem;
+    padding: 0.65rem 1rem;
+}
+
+/* ── Empty States ── */
+.display-1 {
+    opacity: 0.3;
+}

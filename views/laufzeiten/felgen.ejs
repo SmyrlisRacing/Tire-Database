@@ -1,0 +1,84 @@
+<% var pageTitle = 'Laufzeiten Felgen'; %>
+<%- include('../partials/header') %>
+
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-6 fw-bold">
+            <i class="bi bi-gear me-2 text-warning"></i>Laufzeiten – Felgen
+        </h1>
+        <p class="text-muted mb-0">Kumulierte Laufleistung pro Felge – hier auch neue Felgen anlegen</p>
+    </div>
+</div>
+
+<!-- Neue Felge anlegen -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-plus-circle me-2 text-success"></i>Neue Felge anlegen</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="/laufzeiten/felgen" class="row g-3 align-items-end">
+            <input type="hidden" name="action" value="add">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Felgen Nr.</label>
+                <input type="text" name="felgen_nr" class="form-control form-control-lg" placeholder="z.B. F01" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Bemerkung</label>
+                <input type="text" name="bemerkung" class="form-control form-control-lg" placeholder="z.B. BBS 18 Zoll Satz A">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-success btn-lg w-100">
+                    <i class="bi bi-plus-circle me-2"></i>Felge anlegen
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<% if (felgen.length > 0) { %>
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Felgen Nr.</th>
+                    <th class="text-end">Laufzeit (km)</th>
+                    <th class="text-end">Einsätze</th>
+                    <th>Bemerkung</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (const f of felgen) { %>
+                <tr>
+                    <td class="fw-bold fs-5"><%= f.felgen_nr %></td>
+                    <td class="text-end fw-bold fs-5"><%= f.gesamt_km %> km</td>
+                    <td class="text-end"><span class="badge bg-info"><%= f.einsaetze %></span></td>
+                    <td>
+                        <form method="POST" action="/laufzeiten/felgen" class="d-flex gap-2" style="min-width:250px">
+                            <input type="hidden" name="felgen_nr" value="<%= f.felgen_nr %>">
+                            <input type="text" name="bemerkung" class="form-control form-control-sm"
+                                   value="<%= f.bemerkung || '' %>" placeholder="Bemerkung hinzufügen ...">
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Speichern">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </form>
+                    </td>
+                    <td></td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<% } else { %>
+<div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-gear display-1 text-muted"></i>
+        <h3 class="mt-3 text-muted">Noch keine Felgen erfasst</h3>
+        <p class="text-muted">Lege oben eine neue Felge an oder sie werden automatisch erfasst, wenn du eine Felgennummer in einem Eintrag verwendest.</p>
+    </div>
+</div>
+<% } %>
+
+<%- include('../partials/footer') %>

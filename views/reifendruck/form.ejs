@@ -1,0 +1,426 @@
+<%
+var pageTitle = isNew ? 'Neuer Eintrag' : 'Eintrag #' + entry.id + ' bearbeiten';
+function v(field) { return entry[field] != null ? entry[field] : ''; }
+%>
+<%- include('../partials/header') %>
+
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-6 fw-bold">
+            <% if (isNew) { %>
+            <i class="bi bi-plus-circle me-2 text-success"></i>Neuer Reifendruck-Eintrag
+            <% } else { %>
+            <i class="bi bi-pencil me-2 text-warning"></i>Eintrag #<%= entry.id %> bearbeiten
+            <% } %>
+        </h1>
+        <p class="text-muted mb-0">Fülle die Felder aus, die du hast – nicht alle sind Pflicht.</p>
+    </div>
+</div>
+
+<form method="POST" action="<%= isNew ? '/reifendruck/neu' : '/reifendruck/' + entry.id + '/bearbeiten' %>" id="reifendruckForm">
+
+    <!-- ═══ 1. Session-Informationen ═══ -->
+    <div class="card border-0 shadow-sm mb-4 section-card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>1. Session-Informationen</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="datum" class="form-label fw-semibold"><i class="bi bi-calendar3 me-1"></i>Datum</label>
+                    <input type="date" class="form-control form-control-lg" id="datum" name="datum" value="<%= v('datum') %>">
+                </div>
+                <div class="col-md-3">
+                    <label for="strecken_variante" class="form-label fw-semibold"><i class="bi bi-geo-alt me-1"></i>Strecke</label>
+                    <select class="form-select form-select-lg" id="strecken_variante" name="strecken_variante">
+                        <option value="NLS" <%= v('strecken_variante') === 'NLS' ? 'selected' : '' %>>Nordschleife – NLS</option>
+                        <option value="24h" <%= v('strecken_variante') === '24h' ? 'selected' : '' %>>Nordschleife – 24h</option>
+                    </select>
+                    <input type="hidden" id="strecken_laenge" name="strecken_laenge" value="<%= v('strecken_laenge') %>">
+                </div>
+                <div class="col-md-3">
+                    <label for="veranstaltung" class="form-label fw-semibold"><i class="bi bi-trophy me-1"></i>Event</label>
+                    <select class="form-select form-select-lg" id="veranstaltung" name="veranstaltung">
+                        <option value="">— Event wählen —</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="session_typ" class="form-label fw-semibold"><i class="bi bi-flag me-1"></i>Session</label>
+                    <select class="form-select form-select-lg" id="session_typ" name="session_typ">
+                        <option value="">— Bitte wählen —</option>
+                        <option value="Zeittraining" <%= v('session_typ') === 'Zeittraining' ? 'selected' : '' %>>Zeittraining</option>
+                        <option value="Qualy" <%= v('session_typ') === 'Qualy' ? 'selected' : '' %>>Qualifying</option>
+                        <option value="Rennen" <%= v('session_typ') === 'Rennen' ? 'selected' : '' %>>Rennen</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Rennen: Stint, Fahrer, Fahrzeug, Startnummer -->
+            <div class="row g-3 mt-1" id="rennenFields" style="display:none;">
+                <div class="col-md-2">
+                    <label for="stint_nr" class="form-label fw-semibold"><i class="bi bi-hash me-1"></i>Stint Nr.</label>
+                    <input type="number" class="form-control form-control-lg" id="stint_nr" name="stint_nr"
+                           value="<%= v('stint_nr') %>" placeholder="z.B. 1" min="1">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold"><i class="bi bi-person me-1"></i>Fahrer</label>
+                    <input type="text" class="form-control form-control-lg sync-field" data-field="fahrer" name="fahrer"
+                           value="<%= v('fahrer') %>" placeholder="Name des Fahrers">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Fahrzeug</label>
+                    <input type="text" class="form-control form-control-lg sync-field" data-field="fahrzeug" name="fahrzeug"
+                           value="<%= v('fahrzeug') %>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Start-Nr.</label>
+                    <input type="text" class="form-control form-control-lg sync-field" data-field="startnummer" name="startnummer"
+                           value="<%= v('startnummer') %>">
+                </div>
+            </div>
+
+            <!-- Nicht-Rennen: Fahrer, Fahrzeug, Startnummer -->
+            <div class="row g-3 mt-1" id="normalFields">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold"><i class="bi bi-person me-1"></i>Fahrer</label>
+                    <input type="text" class="form-control form-control-lg sync-field" data-field="fahrer"
+                           value="<%= v('fahrer') %>" placeholder="Name des Fahrers">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Fahrzeug</label>
+                    <input type="text" class="form-control form-control-lg sync-field" data-field="fahrzeug"
+                           value="<%= v('fahrzeug') %>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Start-Nr.</label>
+                    <input type="text" class="form-control form-control-lg sync-field" data-field="startnummer"
+                           value="<%= v('startnummer') %>">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ 2. Reifen-Informationen ═══ -->
+    <div class="card border-0 shadow-sm mb-4 section-card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-circle me-2"></i>2. Reifen-Informationen</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Set Nr.</label>
+                    <input type="text" class="form-control form-control-lg" name="set_nr" value="<%= v('set_nr') %>" placeholder="z.B. 1">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Felgen Nr.</label>
+                    <select class="form-select form-select-lg" name="felgen_nr" id="felgen_nr_select">
+                        <option value="">— Felge wählen —</option>
+                        <% for (const f of felgen) { %>
+                        <option value="<%= f.felgen_nr %>" <%= v('felgen_nr') === f.felgen_nr ? 'selected' : '' %>>
+                            <%= f.felgen_nr %><% if (f.bemerkung) { %> (<%= f.bemerkung %>)<% } %>
+                        </option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Marke</label>
+                    <input type="text" class="form-control form-control-lg" name="marke" value="<%= v('marke') %>" placeholder="z.B. Pirelli">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold d-block mb-2">Reifentyp</label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" name="reifen_typ" id="typ_slicks" value="Slicks"
+                               <%= v('reifen_typ') === 'Slicks' || !v('reifen_typ') ? 'checked' : '' %>>
+                        <label class="btn btn-outline-dark btn-lg" for="typ_slicks">
+                            <i class="bi bi-sun me-1"></i>Slicks
+                        </label>
+                        <input type="radio" class="btn-check" name="reifen_typ" id="typ_nass" value="Nass"
+                               <%= v('reifen_typ') === 'Nass' ? 'checked' : '' %>>
+                        <label class="btn btn-outline-primary btn-lg" for="typ_nass">
+                            <i class="bi bi-cloud-rain me-1"></i>Nass
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ 3 & 4. Kalt / Warm – Nebeneinander ═══ -->
+    <div class="row g-4 mb-4">
+        <%
+        const tirePos = [
+            {k:'vl', l:'VL', s:'Vorne Links'},
+            {k:'vr', l:'VR', s:'Vorne Rechts'},
+            {k:'hl', l:'HL', s:'Hinten Links'},
+            {k:'hr', l:'HR', s:'Hinten Rechts'}
+        ];
+        %>
+
+        <!-- ── KALT (Links) ── -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm section-card h-100">
+                <div class="card-header section-cold">
+                    <h5 class="mb-0"><i class="bi bi-thermometer-low me-2"></i>3. KALT</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <label class="form-label fw-semibold small"><i class="bi bi-clock me-1"></i>Uhrzeit</label>
+                            <input type="time" class="form-control" name="zeit_kaltdruck" value="<%= v('zeit_kaltdruck') %>">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-semibold small"><i class="bi bi-cloud me-1"></i>Luft °C</label>
+                            <input type="number" step="0.1" class="form-control" name="luft_temp_kalt" value="<%= v('luft_temp_kalt') %>" placeholder="°C">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-semibold small"><i class="bi bi-thermometer-half me-1"></i>Track °C</label>
+                            <input type="number" step="0.1" class="form-control" name="track_temp_kalt" value="<%= v('track_temp_kalt') %>" placeholder="°C">
+                        </div>
+                    </div>
+                    <div class="tire-pressure-grid">
+                        <% for (const pos of tirePos) { %>
+                        <div class="tire-box cold">
+                            <div class="tire-box-header"><%= pos.l %> <small>(<%= pos.s %>)</small></div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-0 fw-semibold">Druck (bar)</label>
+                                <input type="number" step="0.01" class="form-control form-control-lg text-center fw-bold"
+                                       name="kaltdruck_<%= pos.k %>" value="<%= v('kaltdruck_' + pos.k) %>" placeholder="bar">
+                            </div>
+                            <div class="row g-1">
+                                <% for (const zone of ['aussen','mitte','innen']) { %>
+                                <div class="col-4">
+                                    <label class="form-label x-small text-muted mb-0"><%= zone.charAt(0).toUpperCase() + zone.slice(1) %></label>
+                                    <input type="number" step="0.1" class="form-control form-control-sm text-center"
+                                           name="lft_kalt_<%= pos.k %>_<%= zone %>" value="<%= v('lft_kalt_' + pos.k + '_' + zone) %>" placeholder="°C">
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── WARM (Rechts) ── -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm section-card h-100">
+                <div class="card-header section-hot">
+                    <h5 class="mb-0"><i class="bi bi-thermometer-high me-2"></i>4. WARM</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <label class="form-label fw-semibold small"><i class="bi bi-clock me-1"></i>Uhrzeit</label>
+                            <input type="time" class="form-control" name="zeit_warmdruck" value="<%= v('zeit_warmdruck') %>">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-semibold small"><i class="bi bi-cloud me-1"></i>Luft °C</label>
+                            <input type="number" step="0.1" class="form-control" name="luft_temp_warm" value="<%= v('luft_temp_warm') %>" placeholder="°C">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label fw-semibold small"><i class="bi bi-thermometer-half me-1"></i>Track °C</label>
+                            <input type="number" step="0.1" class="form-control" name="track_temp_warm" value="<%= v('track_temp_warm') %>" placeholder="°C">
+                        </div>
+                    </div>
+                    <div class="tire-pressure-grid">
+                        <% for (const pos of tirePos) { %>
+                        <div class="tire-box hot">
+                            <div class="tire-box-header"><%= pos.l %> <small>(<%= pos.s %>)</small></div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-0 fw-semibold">Druck (bar)</label>
+                                <input type="number" step="0.01" class="form-control form-control-lg text-center fw-bold"
+                                       name="warmdruck_<%= pos.k %>" value="<%= v('warmdruck_' + pos.k) %>" placeholder="bar">
+                            </div>
+                            <div class="row g-1">
+                                <% for (const zone of ['aussen','mitte','innen']) { %>
+                                <div class="col-4">
+                                    <label class="form-label x-small text-muted mb-0"><%= zone.charAt(0).toUpperCase() + zone.slice(1) %></label>
+                                    <input type="number" step="0.1" class="form-control form-control-sm text-center"
+                                           name="lft_warm_<%= pos.k %>_<%= zone %>" value="<%= v('lft_warm_' + pos.k + '_' + zone) %>" placeholder="°C">
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ 5. RDK ═══ -->
+    <div class="card border-0 shadow-sm mb-4 section-card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-broadcast me-2"></i>5. RDK (Reifendruckkontrolle)</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12"><h6 class="text-muted mb-2">Druck (bar)</h6></div>
+                <% for (const pos of [{k:'vl',l:'VL'},{k:'vr',l:'VR'},{k:'hl',l:'HL'},{k:'hr',l:'HR'}]) { %>
+                <div class="col-md-3 col-6">
+                    <div class="pressure-card">
+                        <div class="pressure-label"><%= pos.l %></div>
+                        <input type="number" step="0.01" class="form-control text-center"
+                               name="rdk_druck_<%= pos.k %>" value="<%= v('rdk_druck_' + pos.k) %>" placeholder="bar">
+                    </div>
+                </div>
+                <% } %>
+                <div class="col-12 mt-2"><h6 class="text-muted mb-2">Temperatur (°C)</h6></div>
+                <% for (const pos of [{k:'vl',l:'VL'},{k:'vr',l:'VR'},{k:'hl',l:'HL'},{k:'hr',l:'HR'}]) { %>
+                <div class="col-md-3 col-6">
+                    <div class="pressure-card">
+                        <div class="pressure-label"><%= pos.l %></div>
+                        <input type="number" step="0.1" class="form-control text-center"
+                               name="rdk_temp_<%= pos.k %>" value="<%= v('rdk_temp_' + pos.k) %>" placeholder="°C">
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ 6. Laufleistung ═══ -->
+    <div class="card border-0 shadow-sm mb-4 section-card">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-speedometer me-2"></i>6. Laufleistung</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold"><i class="bi bi-arrow-repeat me-1"></i>Rundenanzahl</label>
+                    <input type="number" class="form-control form-control-lg" name="rundenanzahl"
+                           value="<%= v('rundenanzahl') %>" placeholder="Anzahl Runden">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold"><i class="bi bi-speedometer me-1"></i>Laufzeit in km</label>
+                    <input type="number" step="0.1" class="form-control form-control-lg" name="laufzeit_km"
+                           value="<%= v('laufzeit_km') %>" placeholder="km">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-secondary w-100 btn-lg" id="calcKm"
+                            title="Berechnet km aus Runden × Streckenlänge">
+                        <i class="bi bi-calculator me-1"></i>km berechnen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Speichern ═══ -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <a href="/reifendruck" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Zurück zur Liste
+                </a>
+                <div class="d-flex gap-2">
+                    <% if (!isNew) { %>
+                    <a href="/reifendruck/<%= entry.id %>/duplizieren" class="btn btn-outline-info btn-lg">
+                        <i class="bi bi-copy me-2"></i>Duplizieren
+                    </a>
+                    <% } %>
+                    <button type="submit" class="btn btn-success btn-lg px-5">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <%= isNew ? 'Eintrag speichern' : 'Änderungen speichern' %>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+// ── Event-Optionen pro Strecke ──
+const eventOptionen = {
+    'NLS': ['NLS1','NLS2','NLS3','NLS4','NLS5','NLS6','NLS7','NLS8','NLS9','NLS10'],
+    '24h': ['24h']
+};
+const savedVeranstaltung = '<%= v("veranstaltung") %>';
+
+// ── Strecke → Länge Auto-Fill + Events aktualisieren ──
+const streckenLaengen = { 'NLS': 25.378, '24h': 25.378 };
+const streckeSelect = document.getElementById('strecken_variante');
+const laengeInput = document.getElementById('strecken_laenge');
+const veranstaltungSelect = document.getElementById('veranstaltung');
+
+function updateEventDropdown() {
+    const variante = streckeSelect.value;
+    const events = eventOptionen[variante] || [];
+    veranstaltungSelect.innerHTML = '<option value="">— Event wählen —</option>';
+    events.forEach(ev => {
+        const opt = document.createElement('option');
+        opt.value = ev;
+        opt.textContent = ev;
+        if (ev === savedVeranstaltung) opt.selected = true;
+        veranstaltungSelect.appendChild(opt);
+    });
+}
+
+streckeSelect.addEventListener('change', function() {
+    laengeInput.value = streckenLaengen[this.value] || '';
+    updateEventDropdown();
+});
+updateEventDropdown();
+
+// ── Session-Typ → Rennen-Felder ein-/ausblenden ──
+const sessionSelect = document.getElementById('session_typ');
+const rennenFields = document.getElementById('rennenFields');
+const normalFields = document.getElementById('normalFields');
+
+function updateSessionFields() {
+    const isRennen = sessionSelect.value === 'Rennen';
+    rennenFields.style.display = isRennen ? '' : 'none';
+    normalFields.style.display = isRennen ? 'none' : '';
+}
+sessionSelect.addEventListener('change', updateSessionFields);
+updateSessionFields();
+
+// ── Sync fields between rennen/normal sections ──
+document.querySelectorAll('.sync-field').forEach(input => {
+    input.addEventListener('input', function() {
+        const field = this.dataset.field;
+        document.querySelectorAll(`.sync-field[data-field="${field}"]`).forEach(other => {
+            if (other !== this) other.value = this.value;
+        });
+    });
+});
+
+// ── Before submit: ensure named fields have the correct values ──
+document.getElementById('reifendruckForm').addEventListener('submit', function() {
+    // The named inputs (fahrer, fahrzeug, startnummer) are in rennenFields.
+    // If normalFields is visible, copy values from normalFields to rennenFields.
+    const isRennen = sessionSelect.value === 'Rennen';
+    if (!isRennen) {
+        // Sync normal → rennen (which has the name= attributes)
+        ['fahrer','fahrzeug','startnummer'].forEach(field => {
+            const src = normalFields.querySelector(`[data-field="${field}"]`);
+            const dst = rennenFields.querySelector(`[name="${field}"]`);
+            if (src && dst) dst.value = src.value;
+        });
+        // Briefly show rennenFields so the named inputs are included in form data
+        rennenFields.style.display = '';
+    }
+    formChanged = false;
+});
+
+// ── KM berechnen ──
+document.getElementById('calcKm').addEventListener('click', function() {
+    const runden = parseFloat(document.querySelector('[name="rundenanzahl"]').value);
+    const laenge = parseFloat(laengeInput.value);
+    if (runden && laenge) {
+        document.querySelector('[name="laufzeit_km"]').value = (runden * laenge).toFixed(1);
+    } else {
+        alert('Bitte Rundenanzahl eingeben. Streckenlänge wird automatisch gesetzt.');
+    }
+});
+
+// ── Unsaved changes warning ──
+let formChanged = false;
+document.getElementById('reifendruckForm').addEventListener('input', () => formChanged = true);
+window.addEventListener('beforeunload', function(e) {
+    if (formChanged) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+
+<%- include('../partials/footer') %>
